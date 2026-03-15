@@ -131,6 +131,7 @@ def run_yt_dlp_process(url: str, use_impersonate: bool) -> dict[str, Any]:
     args = [
         resolve_yt_dlp_command(),
         "--dump-single-json",
+        "--ignore-config",
         "--no-playlist",
         "--no-warnings",
         "--skip-download",
