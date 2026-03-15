@@ -57,6 +57,18 @@ def normalize_host(hostname: str) -> str:
     return host
 
 
+def should_use_impersonation(raw_url: str) -> bool:
+    try:
+        host = normalize_host(urlparse(raw_url).hostname or "")
+    except Exception:
+        return True
+
+    if host in {"dailymotion.com", "dai.ly"} or host.endswith(".dailymotion.com"):
+        return False
+
+    return True
+
+
 def is_supported_social_url(raw_url: str) -> bool:
     try:
         parsed = urlparse(raw_url)
@@ -162,7 +174,7 @@ def run_yt_dlp_process(url: str, use_impersonate: bool) -> dict[str, Any]:
 
 def run_yt_dlp(url: str) -> dict[str, Any]:
     try:
-        return run_yt_dlp_process(url, use_impersonate=True)
+        return run_yt_dlp_process(url, use_impersonate=should_use_impersonation(url))
     except HTTPException as exc:
         text = str(exc.detail).lower()
         if "impersonat" in text:
