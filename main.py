@@ -5,6 +5,7 @@ import os
 import subprocess
 from typing import Any
 from urllib.parse import urlparse
+from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
@@ -97,9 +98,21 @@ def extractor_failure_status(detail: str) -> int:
     return 502
 
 
+def resolve_yt_dlp_command() -> str:
+    env_path = (os.getenv("YTDLP_PATH") or "").strip()
+    if env_path:
+        return env_path
+
+    local_binary = Path.cwd() / "bin" / "yt-dlp"
+    if local_binary.exists():
+        return str(local_binary)
+
+    return "yt-dlp"
+
+
 def run_yt_dlp_process(url: str, use_impersonate: bool) -> dict[str, Any]:
     args = [
-        "yt-dlp",
+        resolve_yt_dlp_command(),
         "--dump-single-json",
         "--no-playlist",
         "--no-warnings",
@@ -155,7 +168,7 @@ def run_yt_dlp(url: str) -> dict[str, Any]:
 def resolve_yt_dlp_version() -> str | None:
     try:
         result = subprocess.run(
-            ["yt-dlp", "--version"],
+            [resolve_yt_dlp_command(), "--version"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             timeout=10,
