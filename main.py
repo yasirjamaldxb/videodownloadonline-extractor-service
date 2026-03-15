@@ -45,6 +45,11 @@ def root() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.head("/")
+def root_head() -> None:
+    return None
+
+
 def normalize_host(hostname: str) -> str:
     host = hostname.strip().lower()
     if host.startswith("www."):
@@ -264,6 +269,11 @@ def health() -> HealthResponse:
         extractorMode="external-service",
         ytDlpVersion=resolve_yt_dlp_version(),
     )
+
+
+@app.head("/health")
+def health_head() -> None:
+    return None
 
 
 @app.post("/extract")
