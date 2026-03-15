@@ -212,16 +212,21 @@ def map_formats(payload: dict[str, Any]) -> list[dict[str, Any]]:
                 "hasVideo": bool(item.get("vcodec") and item.get("vcodec") != "none"),
                 "hasAudio": bool(item.get("acodec") and item.get("acodec") != "none"),
                 "url": url,
+                "isManifestSource": ".m3u8" in str(url).lower(),
             }
         )
 
     mapped.sort(
         key=lambda x: (
             0 if x["hasVideo"] else 1,
+            0 if not x["isManifestSource"] else 1,
             -(int(str(x["qualityLabel"]).replace("p", "")) if str(x["qualityLabel"]).replace("p", "").isdigit() else 0),
             0 if x["hasAudio"] else 1,
         )
     )
+
+    if any(not row["isManifestSource"] for row in mapped):
+        mapped = [row for row in mapped if not row["isManifestSource"]]
 
     deduped: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -231,7 +236,9 @@ def map_formats(payload: dict[str, Any]) -> list[dict[str, Any]]:
         if key in seen:
             continue
         seen.add(key)
-        deduped.append(row)
+        clean_row = dict(row)
+        clean_row.pop("isManifestSource", None)
+        deduped.append(clean_row)
 
     if deduped:
         return deduped[:20]
