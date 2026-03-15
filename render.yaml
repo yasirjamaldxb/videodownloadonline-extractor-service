@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: videodownloadonline-extractor
+    runtime: docker
+    plan: free
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: EXTRACTOR_API_KEY
+        sync: false
+      - key: YTDLP_CHANNEL
+        value: nightly
