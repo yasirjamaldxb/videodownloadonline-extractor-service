@@ -39,6 +39,11 @@ class HealthResponse(BaseModel):
     ytDlpVersion: str | None = None
 
 
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"status": "ok"}
+
+
 def normalize_host(hostname: str) -> str:
     host = hostname.strip().lower()
     if host.startswith("www."):
