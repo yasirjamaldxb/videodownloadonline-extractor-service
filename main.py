@@ -165,7 +165,7 @@ def run_yt_dlp(url: str) -> dict[str, Any]:
         return run_yt_dlp_process(url, use_impersonate=True)
     except HTTPException as exc:
         text = str(exc.detail).lower()
-        if "impersonat" in text and ("unsupported" in text or "not available" in text):
+        if "impersonat" in text:
             return run_yt_dlp_process(url, use_impersonate=False)
         raise
 
